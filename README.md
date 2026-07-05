@@ -179,19 +179,19 @@ These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inferen
 
 | Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | 76.44 tok/s | 74.11 tok/s | **-3.1%** |
-| **Avg Completion Tokens** | 1979.2 | 1245.6 | **-37.1%** |
+| **Decode Throughput** | 70.66 tok/s | 76.02 tok/s | **+7.6%** |
+| **Avg Completion Tokens** | 2860.4 | 1993.2 | **-30.3%** |
 | **Correctness Rate** | 1.0% | 1.0% | **+0.0%** |
-| **Avg TTFT (s)** | 0.797s | 0.801s | **+0.5%** |
+| **Avg TTFT (s)** | 0.818s | 0.802s | **-2.0%** |
 
 ### B. LAVD Context Consistency Test
 *The LAVD arithmetic and context retention test profile.*
 
 | Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | 86.15 tok/s | 88.35 tok/s | **+2.6%** |
-| **Avg Completion Tokens** | 18113.6 | 15561.8 | **-14.1%** |
+| **Decode Throughput** | 85.53 tok/s | 87.60 tok/s | **+2.4%** |
+| **Avg Completion Tokens** | 18492.4 | 14127.0 | **-23.6%** |
 | **Correctness Rate** | 1.0% | 1.0% | **+0.0%** |
-| **Avg TTFT (s)** | 0.516s | 0.515s | **-0.2%** |
+| **Avg TTFT (s)** | 0.512s | 0.508s | **-0.8%** |
 
 *Note: Results were parsed automatically from the generated JSON artifacts.*
