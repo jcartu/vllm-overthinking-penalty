@@ -169,3 +169,29 @@ The plugin **hurt accuracy** on this task. The LAVD test requires careful row-by
 | **LAVD** (data audit) | +6% (longer!) | **−40%** | **No** 🔴 |
 
 **The plugin is task-dependent.** It validates the paper's core claim on reasoning tasks (estonia: dramatic token reduction, zero accuracy loss), but the "zero degradation" guarantee does **not** hold universally. On precision/detail tasks where double-checking is productive (lavd), suppressing hesitation tokens causes the model to skip verification steps, degrading accuracy by 40%. The paper's recommendation of λ=5.0 is safe for math/logic reasoning but should be reduced or disabled for detail-oriented analytical workloads.
+
+## 5. VoIPmonitor Official Benchmark Results (LAVD & ESTONIA)
+
+These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inference-bench` repository. They measure the exact same GLM-5.2 engine under sustained concurrency ($C=4$, $N=10$ trials) with the overthinking penalty turned **ON** ($\lambda = 5.0$) vs **OFF** ($\lambda = 0.0$).
+
+### A. ESTONIA Long-Context Completion Test
+*The default long-context test profile embedding the GLM long-context evaluation task.*
+
+| Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
+| :--- | :---: | :---: | :---: |
+| **Decode Throughput** | 79.11 tok/s | 75.83 tok/s | **-4.2%** |
+| **Avg Completion Tokens** | 2143.0 | 1347.8 | **-37.1%** |
+| **Correctness Rate** | 1.0% | 1.0% | **+0.0%** |
+| **Avg TTFT (s)** | 0.791s | 0.799s | **+1.0%** |
+
+### B. LAVD Context Consistency Test
+*The LAVD arithmetic and context retention test profile.*
+
+| Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
+| :--- | :---: | :---: | :---: |
+| **Decode Throughput** | 86.48 tok/s | 87.17 tok/s | **+0.8%** |
+| **Avg Completion Tokens** | 25792.0 | 13773.2 | **-46.6%** |
+| **Correctness Rate** | 1.0% | 1.0% | **+0.0%** |
+| **Avg TTFT (s)** | 1.988s | 0.514s | **-74.1%** |
+
+*Note: Results were parsed automatically from the generated JSON artifacts.*
