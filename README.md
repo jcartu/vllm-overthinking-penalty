@@ -148,9 +148,9 @@ These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inferen
 
 | Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | 68.95 tok/s | 69.26 tok/s | **+0.4%** |
+| **Decode Throughput** | 95.09 tok/s | 91.36 tok/s | **-3.9%** |
 | **Avg Completion Tokens** | 2048.0 | 2048.0 | **+0.0%** |
 | **Correctness Rate** | 0.0% | 0.0% | **+0.0%** |
-| **Avg TTFT (s)** | 0.462s | 0.460s | **-0.3%** |
+| **Avg TTFT (s)** | 0.227s | 0.217s | **-4.6%** |
 
 *Note: Results were parsed automatically from the generated JSON artifacts.*
