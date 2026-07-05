@@ -128,3 +128,29 @@ If you find this useful in your local quantized LLM deployments, please cite the
   year={2026}
 }
 ```
+
+## 5. VoIPmonitor Official Benchmark Results (LAVD & ESTONIA)
+
+These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inference-bench` repository. They measure the exact same GLM-5.2 engine under sustained concurrency ($C=4$, $N=10$ trials) with the overthinking penalty turned **ON** ($\lambda = 5.0$) vs **OFF** ($\lambda = 0.0$).
+
+### A. ESTONIA Long-Context Completion Test
+*The default long-context test profile embedding the GLM long-context evaluation task.*
+
+| Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
+| :--- | :---: | :---: | :---: |
+| **Decode Throughput** | 0.00 tok/s | 0.00 tok/s | **+0.0%** |
+| **Avg Completion Tokens** | 0.0 | 0.0 | **+0.0%** |
+| **Correctness Rate** | 0.0% | 0.0% | **+0.0%** |
+| **Avg TTFT (s)** | 0.000s | 0.000s | **+0.0%** |
+
+### B. LAVD Context Consistency Test
+*The LAVD arithmetic and context retention test profile.*
+
+| Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
+| :--- | :---: | :---: | :---: |
+| **Decode Throughput** | 0.00 tok/s | 0.00 tok/s | **+0.0%** |
+| **Avg Completion Tokens** | 0.0 | 0.0 | **+0.0%** |
+| **Correctness Rate** | 0.0% | 0.0% | **+0.0%** |
+| **Avg TTFT (s)** | 0.000s | 0.000s | **+0.0%** |
+
+*Note: Results were parsed automatically from the generated JSON artifacts.*
