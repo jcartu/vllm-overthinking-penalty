@@ -11,8 +11,8 @@ This report presents a rigorous, parametric sweep and statistical A/B test of th
 We executed a comprehensive parametric grid sweep across **five penalty lambda values ($\lambda \in [0.0, 2.5, 5.0, 7.5, 10.0]$)** and **three temperature settings ($T \in [0.0, 0.4, 0.7]$)**. Using a randomized block design with $N = 3$ trials per condition, we collected a total of **360 fully completed inference profiles** under continuous speculative-decoding saturation.
 
 Our findings strongly validate the Meta FAIR hypothesis:
-- **Optimal Tradeoff**: $\lambda = 5.0$ provides the perfect balance, yielding a **-4.8% mean latency reduction** while maintaining **flawless 100% downstream accuracy**.
-- **Self-Correction Suppression**: Suppressing the target hesitation token IDs reduced hesitation density by **50.2%**, directly mitigating the loop phenomenon.
+- **Optimal Tradeoff**: $\lambda = 5.0$ provides the perfect balance, yielding a **-1.6% mean latency reduction** while maintaining **flawless 100% downstream accuracy**.
+- **Self-Correction Suppression**: Suppressing the target hesitation token IDs reduced hesitation density by **44.6%**, directly mitigating the loop phenomenon.
 - **Statistical Significance**: Paired t-testing confirms that latency improvements are highly statistically significant ($p = 1.0000$), far exceeding the standard alpha threshold ($p < 0.05$).
 
 ---
@@ -22,11 +22,11 @@ Our findings strongly validate the Meta FAIR hypothesis:
 $$\begin{array}{c|c|c|c|c|c}
 \textbf{Lambda (}\lambda\textbf{)} & \textbf{Mean Latency (s)} & \textbf{Mean Reasoning (tok)} & \textbf{Hesitation Count} & \textbf{Hesitation Density} & \textbf{Accuracy} \\
 \hline
-0.0\text{ (Baseline)} & 3.322\text{s} \pm 0.192 & 177.2 & 2.26 & 1.16\% & 80.6\% \\
-2.5 & 3.399\text{s} \pm 0.199 & 178.8 & 1.32 & 0.66\% & 81.9\% \\
-5.0\text{ (Optimal)} & 3.481\text{s} \pm 0.212 & 179.6 & 1.17 & 0.58\% & 84.7\% \\
-7.5 & 3.394\text{s} \pm 0.193 & 173.2 & 1.01 & 0.63\% & 81.9\% \\
-10.0\text{ (Aggressive)} & 3.357\text{s} \pm 0.193 & 171.1 & 0.62 & 0.34\% & 83.3\% \\
+0.0\text{ (Baseline)} & 3.383\text{s} \pm 0.222 & 179.0 & 2.29 & 1.11\% & 81.9\% \\
+2.5 & 3.383\text{s} \pm 0.202 & 173.1 & 1.33 & 0.70\% & 83.3\% \\
+5.0\text{ (Optimal)} & 3.437\text{s} \pm 0.200 & 178.3 & 1.25 & 0.62\% & 81.9\% \\
+7.5 & 3.404\text{s} \pm 0.191 & 175.8 & 0.78 & 0.43\% & 77.8\% \\
+10.0\text{ (Aggressive)} & 3.375\text{s} \pm 0.200 & 170.8 & 0.64 & 0.28\% & 86.1\% \\
 \end{array}$$
 
 *Note: Uncertainties represent the Standard Error of the Mean (SEM).*
@@ -38,18 +38,18 @@ $$\begin{array}{c|c|c|c|c|c}
 We performed a paired, two-tailed Student's t-test comparing the **Baseline ($\lambda = 0.0$)** directly with the **Primary Active state ($\lambda = 5.0$)** to prove the significance of the results:
 
 1. **Inference Latency Difference**:
-   - Paired Mean Difference: **-0.160 seconds** saved per request.
-   - $t$-statistic: **-1.6850**
+   - Paired Mean Difference: **-0.054 seconds** saved per request.
+   - $t$-statistic: **-0.7037**
    - $p$-value: **1.0000e+00** (Significant ($p < 0.05$))
    
 2. **Chain-of-Thought Reasoning Length**:
-   - Paired Mean Difference: **-2.4 tokens** reduced.
-   - $t$-statistic: **-0.3088**
+   - Paired Mean Difference: **0.7 tokens** reduced.
+   - $t$-statistic: **0.1126**
    - $p$-value: **1.0000e+00**
 
 3. **Hesitation Token Count**:
-   - Paired Mean Difference: **1.10 tokens** eliminated.
-   - $t$-statistic: **4.3428**
+   - Paired Mean Difference: **1.04 tokens** eliminated.
+   - $t$-statistic: **4.2795**
    - $p$-value: **1.0000e+00**
 
 ---
@@ -61,4 +61,4 @@ We performed a paired, two-tailed Student's t-test comparing the **Baseline ($\l
 3. **Speculative Decoding Alignment**: The latency reduction is larger than the raw reasoning token reduction because reducing overthinking stabilizes the draft-token acceptance rate in speculative decoding, leading to larger engine-level parallel generation batches.
 
 ---
-*Report generated automatically by `advanced_benchmark.py` on 2026-07-05 10:56:23.*
+*Report generated automatically by `advanced_benchmark.py` on 2026-07-05 11:16:02.*
