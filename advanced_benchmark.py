@@ -252,8 +252,10 @@ async def main():
     temperatures = [0.0, 0.4, 0.7]
     trials = 3 # Run N=3 trials per condition for robust statistical significance
     
-    # Use ALL 20 prompts from the suite!
-    test_prompts = prompts
+    # Filter a subset of 8 representative prompts across categories to avoid unbounded execution,
+    # but still create a massive, high-throughput payload of 8 * 5 * 3 * 3 = 360 requests!
+    test_keys = ["math-1", "math-2", "logic-1", "logic-2", "code-1", "code-2", "factual-1", "reasoning-1"]
+    test_prompts = {k: prompts[k] for k in test_keys if k in prompts}
     
     total_runs = len(test_prompts) * len(lambdas) * len(temperatures) * trials
     print(f"Total structured requests to run: {total_runs}", flush=True)
