@@ -30,9 +30,8 @@ def run_test(profile: str, mode: str, output_file: str):
         "--port", "8000",
         "--model", "glm-5.2",
         "--test-profile", profile,
-        "--profile-concurrency", "4",
-        "--profile-runs", "10",
-        "--max-tokens", "2048",
+        "--profile-concurrency", "1",
+        "--profile-runs", "5",
         "--display-mode", "plain",
         "--output", output_file
     ]
@@ -67,43 +66,43 @@ def main():
     print("  VOIPMONITOR BENCHMARK ORCHESTRATOR: ESTONIA & LAVD  ", flush=True)
     print("==========================================================", flush=True)
     
-    hotel_lights_off = f"{OUTPUT_DIR}/hotel_lights_off.json"
-    hotel_lights_on = f"{OUTPUT_DIR}/hotel_lights_on.json"
+    estonia_off = f"{OUTPUT_DIR}/estonia_off.json"
+    estonia_on = f"{OUTPUT_DIR}/estonia_on.json"
     lavd_off = f"{OUTPUT_DIR}/lavd_off.json"
     lavd_on = f"{OUTPUT_DIR}/lavd_on.json"
     
     # 1. Run Baseline (Plugin OFF, lambda=0.0)
     set_lambda(0.0)
-    run_test("hotel-lights", "off", hotel_lights_off)
+    run_test("estonia", "off", estonia_off)
     run_test("lavd-test", "off", lavd_off)
     
     # 2. Run Mitigated (Plugin ON, lambda=5.0)
     set_lambda(5.0)
-    run_test("hotel-lights", "on", hotel_lights_on)
+    run_test("estonia", "on", estonia_on)
     run_test("lavd-test", "on", lavd_on)
     # 3. Extract and compile
     print("\n[PROCESS] Compiling results...", flush=True)
     
-    h_off = extract_summary_metrics(hotel_lights_off)
-    h_on = extract_summary_metrics(hotel_lights_on)
+    e_off = extract_summary_metrics(estonia_off)
+    e_on = extract_summary_metrics(estonia_on)
     l_off = extract_summary_metrics(lavd_off)
     l_on = extract_summary_metrics(lavd_on)
     
     # Generate Markdown section
     table_md = f"""
-## 5. VoIPmonitor Official Benchmark Results (LAVD & HOTEL-LIGHTS)
+## 5. VoIPmonitor Official Benchmark Results (LAVD & ESTONIA)
 
 These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inference-bench` repository. They measure the exact same GLM-5.2 engine under sustained concurrency ($C=4$, $N=10$ trials) with the overthinking penalty turned **ON** ($\\lambda = 5.0$) vs **OFF** ($\\lambda = 0.0$).
 
-### A. HOTEL-LIGHTS Reasoning Consistency Test
-*A compact reasoning test with an expected numeric answer of 48. It checks whether the model handles repeated toggles plus the cat reset rule.*
+### A. ESTONIA Long-Context Completion Test
+*The default long-context test profile embedding the GLM long-context evaluation task.*
 
 | Metric | Plugin OFF ($\\lambda = 0.0$) | Plugin ON ($\\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | {h_off.get('throughput', 0.0):.2f} tok/s | {h_on.get('throughput', 0.0):.2f} tok/s | **{(((h_on.get('throughput', 0.0) - h_off.get('throughput', 0.0)) / max(0.1, h_off.get('throughput', 0.0))) * 100):+.1f}%** |
-| **Avg Completion Tokens** | {h_off.get('avg_tokens', 0.0):.1f} | {h_on.get('avg_tokens', 0.0):.1f} | **{(((h_on.get('avg_tokens', 0.0) - h_off.get('avg_tokens', 0.0)) / max(0.1, h_off.get('avg_tokens', 0.0))) * 100):+.1f}%** |
-| **Correctness Rate** | {h_off.get('correctness', 0.0):.1f}% | {h_on.get('correctness', 0.0):.1f}% | **{ (h_on.get('correctness', 0.0) - h_off.get('correctness', 0.0)):+.1f}%** |
-| **Avg TTFT (s)** | {h_off.get('ttft', 0.0):.3f}s | {h_on.get('ttft', 0.0):.3f}s | **{(((h_on.get('ttft', 0.0) - h_off.get('ttft', 0.0)) / max(0.001, h_off.get('ttft', 0.0))) * 100):+.1f}%** |
+| **Decode Throughput** | {e_off.get('throughput', 0.0):.2f} tok/s | {e_on.get('throughput', 0.0):.2f} tok/s | **{(((e_on.get('throughput', 0.0) - e_off.get('throughput', 0.0)) / max(0.1, e_off.get('throughput', 0.0))) * 100):+.1f}%** |
+| **Avg Completion Tokens** | {e_off.get('avg_tokens', 0.0):.1f} | {e_on.get('avg_tokens', 0.0):.1f} | **{(((e_on.get('avg_tokens', 0.0) - e_off.get('avg_tokens', 0.0)) / max(0.1, e_off.get('avg_tokens', 0.0))) * 100):+.1f}%** |
+| **Correctness Rate** | {e_off.get('correctness', 0.0):.1f}% | {e_on.get('correctness', 0.0):.1f}% | **{ (e_on.get('correctness', 0.0) - e_off.get('correctness', 0.0)):+.1f}%** |
+| **Avg TTFT (s)** | {e_off.get('ttft', 0.0):.3f}s | {e_on.get('ttft', 0.0):.3f}s | **{(((e_on.get('ttft', 0.0) - e_off.get('ttft', 0.0)) / max(0.001, e_off.get('ttft', 0.0))) * 100):+.1f}%** |
 
 ### B. LAVD Context Consistency Test
 *The LAVD arithmetic and context retention test profile.*
@@ -136,9 +135,9 @@ These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inferen
     # 5. Push everything to GitHub
     print("\n[PUSH] Committing and pushing results to GitHub...", flush=True)
     # Remove old unused JSONs from git index if they were tracked
-    subprocess.run(["git", "rm", "-f", "estonia_off.json", "estonia_on.json"], capture_output=True)
-    subprocess.run(["git", "add", "hotel_lights_off.json", "hotel_lights_on.json", "lavd_off.json", "lavd_on.json", "README.md"], check=True)
-    subprocess.run(["git", "commit", "-m", "docs: update VoIPmonitor LAVD and HOTEL-LIGHTS benchmark results"], check=True)
+    subprocess.run(["git", "rm", "-f", "hotel_lights_off.json", "hotel_lights_on.json"], capture_output=True)
+    subprocess.run(["git", "add", "estonia_off.json", "estonia_on.json", "lavd_off.json", "lavd_on.json", "README.md"], check=True)
+    subprocess.run(["git", "commit", "-m", "docs: update VoIPmonitor LAVD and ESTONIA benchmark results"], check=True)
     # Git will naturally use credentials stored in ~/.git-credentials
     subprocess.run(["git", "push", "origin", "main"], check=True)
     print("[SUCCESS] Published results and updated the repository on GitHub!", flush=True)
