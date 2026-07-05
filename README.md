@@ -129,28 +129,28 @@ If you find this useful in your local quantized LLM deployments, please cite the
 }
 ```
 
-## 5. VoIPmonitor Official Benchmark Results (LAVD & ESTONIA)
+## 5. VoIPmonitor Official Benchmark Results (LAVD & HOTEL-LIGHTS)
 
 These benchmarks are sourced from Martin Vit's official voipmonitor `llm-inference-bench` repository. They measure the exact same GLM-5.2 engine under sustained concurrency ($C=4$, $N=10$ trials) with the overthinking penalty turned **ON** ($\lambda = 5.0$) vs **OFF** ($\lambda = 0.0$).
 
-### A. ESTONIA Long-Context Completion Test
-*The default long-context test profile embedding the GLM long-context evaluation task.*
+### A. HOTEL-LIGHTS Reasoning Consistency Test
+*A compact reasoning test with an expected numeric answer of 48. It checks whether the model handles repeated toggles plus the cat reset rule.*
 
 | Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | 0.00 tok/s | 0.00 tok/s | **+0.0%** |
-| **Avg Completion Tokens** | 0.0 | 0.0 | **+0.0%** |
+| **Decode Throughput** | 71.43 tok/s | 70.78 tok/s | **-0.9%** |
+| **Avg Completion Tokens** | 2048.0 | 2048.0 | **+0.0%** |
 | **Correctness Rate** | 0.0% | 0.0% | **+0.0%** |
-| **Avg TTFT (s)** | 0.000s | 0.000s | **+0.0%** |
+| **Avg TTFT (s)** | 0.429s | 0.426s | **-0.7%** |
 
 ### B. LAVD Context Consistency Test
 *The LAVD arithmetic and context retention test profile.*
 
 | Metric | Plugin OFF ($\lambda = 0.0$) | Plugin ON ($\lambda = 5.0$) | Difference |
 | :--- | :---: | :---: | :---: |
-| **Decode Throughput** | 57.60 tok/s | 55.64 tok/s | **-3.4%** |
+| **Decode Throughput** | 68.76 tok/s | 68.92 tok/s | **+0.2%** |
 | **Avg Completion Tokens** | 2048.0 | 2048.0 | **+0.0%** |
 | **Correctness Rate** | 0.0% | 0.0% | **+0.0%** |
-| **Avg TTFT (s)** | 4.155s | 0.499s | **-88.0%** |
+| **Avg TTFT (s)** | 3.630s | 0.465s | **-87.2%** |
 
 *Note: Results were parsed automatically from the generated JSON artifacts.*
