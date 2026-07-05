@@ -146,7 +146,7 @@ Benchmarks run against **GLM-5.2-Int8Mix-NVFP4-REAP-594B** on 4× RTX PRO 6000 B
 
 ### B. LAVD — Context Consistency / Data-Audit Test
 
-*167-row CSV ticket-register task; model must find human errors and return corrected counts (expected: 72 tickets, 46 hours). Run on DCP1 (120k context) with `--max-tokens 16000`.*
+*167-row CSV ticket-register task; model must find human errors and return corrected counts (expected: 72 tickets, 46 hours). Run on DCP1 (120k context) with **unlimited max-tokens** (profile default) — the model thinks as long as it needs. All runs finished naturally (`finish_reason=stop`), zero truncation.*
 
 | Metric | Plugin OFF (λ=0.0) | Plugin ON (λ=5.0) | Difference |
 | :--- | :---: | :---: | :---: |
@@ -156,11 +156,13 @@ Benchmarks run against **GLM-5.2-Int8Mix-NVFP4-REAP-594B** on 4× RTX PRO 6000 B
 | **Decode Throughput** | 85.5 tok/s | 87.6 tok/s | +2.5% |
 | **Avg TTFT** | 0.512s | 0.508s | −0.8% |
 
-### C. Verdict — the paper is validated
+### C. Verdict — the paper is validated (with caveats)
 
 | Test | Token reduction | Accuracy impact | Plugin helps? |
 | :--- | :---: | :---: | :---: |
 | **ESTONIA** (reasoning) | **−30%** | 0% (100% both) | **Yes** ✅ |
 | **LAVD** (data audit) | **−24%** | 0% (100% both, more exact) | **Yes** ✅ |
 
-**The plugin works on both task types with zero accuracy degradation.** Across reasoning (estonia) and data-audit (lavd) tasks, the overthinking penalty consistently reduces completion tokens by **24-30%** while maintaining perfect correctness — and on LAVD it actually improved scoring precision (5 exact vs 4 exact + 1 near). These results validate the paper's core claims: suppressing hesitation tokens shortens the CoT without losing accuracy, yielding faster wall-clock answers and lower compute cost. The λ=5.0 default is safe across task types.
+**The plugin works on both task types with zero accuracy degradation.** Across reasoning (estonia) and data-audit (lavd) tasks, the overthinking penalty consistently reduces completion tokens by **24-30%** while maintaining perfect correctness — and on LAVD it actually improved scoring precision (5 exact vs 4 exact + 1 near). These results validate the paper's core claims: suppressing hesitation tokens shortens the CoT without losing accuracy, yielding faster wall-clock answers and lower compute cost.
+
+**Caveats:** (1) Tests ran at the model's default reasoning effort (typically `high`, not `max`). GLM-5.2 at `max` effort thinks substantially more and produces stronger results — the plugin's effect may differ at higher effort levels. (2) Sample size is n=5 per condition — sufficient to show the trend but not to rule out small effects. (3) The λ=5.0 default is safe across both task types tested here, but heavier reasoning workloads may benefit from tuning.
