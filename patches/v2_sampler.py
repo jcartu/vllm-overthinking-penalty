@@ -4,6 +4,8 @@
 import os
 import sys
 import logging
+import json
+import time
 
 import numpy as np
 import torch
@@ -59,27 +61,33 @@ class Sampler:
         # Overthinking penalty (arxiv 2606.00206): subtracts lambda from
         # hesitation token IDs to reduce CoT length in quantized reasoning
         # models. Stateless — safe with speculative decoding (MTP).
-        self._ot_penalty = None
-        self._ot_lambda = float(os.environ.get("OVERTHINKING_PENALTY_LAMBDA", "0"))
-        if self._ot_lambda > 0:
-            _plugin_dir = os.environ.get("OVERTHINKING_PLUGIN_DIR", "/opt/vllm-plugins")
-            if _plugin_dir not in sys.path:
-                sys.path.insert(0, _plugin_dir)
-            _DEFAULT_HESITATION_TOKEN_IDS = [
-                11, 67, 71, 83, 265, 552, 1347, 1419, 1975, 2028,
-                2152, 2371, 2753, 3821, 3983, 4331, 5482, 5569, 6282, 7615,
-                7887, 8087, 10857, 11484, 12440, 13123, 14181, 24636, 26779, 27356,
-                32618, 33141, 34696, 36569, 40190, 49893, 52246, 63108, 64796, 72465,
-                79380, 91243, 97009,
-            ]
-            _tokens_env = os.environ.get("OVERTHINKING_PENALTY_TOKENS")
-            _token_ids = [int(t.strip()) for t in _tokens_env.split(",") if t.strip()] if _tokens_env else _DEFAULT_HESITATION_TOKEN_IDS
-            self._ot_penalty = torch.zeros(vocab_size, dtype=torch.float32, device=device)
-            self._ot_penalty[_token_ids] = -self._ot_lambda
+        self._ot_vocab_size = vocab_size
+        self._ot_device = device
+        self._ot_penalty = torch.zeros(vocab_size, dtype=torch.float32, device=device)
+        self._ot_cached_lambda = 0.0
+        self._ot_last_read = 0.0
+        self._ot_config_path = "/opt/vllm-plugins/dynamic_config.json"
+
+        # Set up token IDs
+        _DEFAULT_HESITATION_TOKEN_IDS = [
+            11, 67, 71, 83, 265, 552, 1347, 1419, 1975, 2028,
+            2152, 2371, 2753, 3821, 3983, 4331, 5482, 5569, 6282, 7615,
+            7887, 8087, 10857, 11484, 12440, 13123, 14181, 24636, 26779, 27356,
+            32618, 33141, 34696, 36569, 40190, 49893, 52246, 63108, 64796, 72465,
+            79380, 91243, 97009,
+        ]
+        _tokens_env = os.environ.get("OVERTHINKING_PENALTY_TOKENS")
+        self._ot_token_ids = [int(t.strip()) for t in _tokens_env.split(",") if t.strip()] if _tokens_env else _DEFAULT_HESITATION_TOKEN_IDS
+
+        # Initial environment-based lambda
+        _env_lambda = float(os.environ.get("OVERTHINKING_PENALTY_LAMBDA", "5.0"))
+        if _env_lambda > 0:
+            self._ot_cached_lambda = _env_lambda
+            self._ot_penalty[self._ot_token_ids] = -_env_lambda
             _logger = logging.getLogger("vllm.v1.worker.gpu.sample.sampler")
             _logger.warning(
-                "OverthinkingPenalty: active — lambda=%.2f, %d tokens, vocab_size=%d",
-                self._ot_lambda, len(_token_ids), vocab_size,
+                "OverthinkingPenalty: active (env baseline) — lambda=%.2f, %d tokens, vocab_size=%d",
+                _env_lambda, len(self._ot_token_ids), vocab_size,
             )
         self.use_flashinfer = flashinfer_sampler_supported()
 
@@ -191,9 +199,30 @@ class Sampler:
             logits, expanded_idx_mapping, idx_mapping_np, pos
         )
 
-        # Apply overthinking penalty in place (before temperature, affects
-        # both greedy and random sampling). See arxiv 2606.00206.
-        if self._ot_penalty is not None:
+        # Dynamic overthinking config check (1-second TTL throttle to prevent disk I/O bottlenecks).
+        _now = time.time()
+        if _now - self._ot_last_read > 1.0:
+            self._ot_last_read = _now
+            try:
+                if os.path.exists(self._ot_config_path):
+                    with open(self._ot_config_path, "r") as _f:
+                        _config = json.load(_f)
+                        _new_lambda = float(_config.get("lambda", 5.0))
+                        if _new_lambda != self._ot_cached_lambda:
+                            self._ot_cached_lambda = _new_lambda
+                            self._ot_penalty.zero_()
+                            if _new_lambda > 0:
+                                self._ot_penalty[self._ot_token_ids] = -_new_lambda
+                            _logger = logging.getLogger("vllm.v1.worker.gpu.sample.sampler")
+                            _logger.warning(
+                                "OverthinkingPenalty: dynamically changed lambda to %.2f on device %s",
+                                _new_lambda, self._ot_device
+                            )
+            except Exception as _e:
+                # Ignore disk read/parse exceptions gracefully during active inference
+                pass
+
+        if self._ot_cached_lambda > 0:
             logits.add_(self._ot_penalty)
 
         # Apply penalties in place.

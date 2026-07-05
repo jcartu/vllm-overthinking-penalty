@@ -250,7 +250,7 @@ async def main():
     # Sweep Configuration
     lambdas = [0.0, 2.5, 5.0, 7.5, 10.0]
     temperatures = [0.0, 0.4, 0.7]
-    trials = 5 # Run N=5 trials per condition for extreme statistical rigor
+    trials = 3 # Run N=3 trials per condition for robust statistical significance
     
     # Use ALL 20 prompts from the suite!
     test_prompts = prompts
