@@ -1,0 +1,146 @@
+{
+  "suite": "overthinking-penalty-benchmark",
+  "description": "Before/after benchmark for vLLM logit processor penalty on GLM-5.2",
+  "prompts": [
+    {
+      "id": "math-1",
+      "category": "math",
+      "prompt": "What is 17 * 23? Show your work briefly.",
+      "answer_regex": "\\b391\\b",
+      "answer_description": "391"
+    },
+    {
+      "id": "math-2",
+      "category": "math",
+      "prompt": "What is 15% of 240?",
+      "answer_regex": "\\b36\\b",
+      "answer_description": "36"
+    },
+    {
+      "id": "math-3",
+      "category": "math",
+      "prompt": "If a train travels 60 mph for 2.5 hours, how far does it go in miles?",
+      "answer_regex": "\\b150\\b",
+      "answer_description": "150"
+    },
+    {
+      "id": "math-4",
+      "category": "math",
+      "prompt": "What is the square root of 144?",
+      "answer_regex": "\\b12\\b",
+      "answer_description": "12"
+    },
+    {
+      "id": "math-5",
+      "category": "math",
+      "prompt": "What is 7 factorial (7!)?",
+      "answer_regex": "\\b5,?040\\b",
+      "answer_description": "5040"
+    },
+    {
+      "id": "logic-1",
+      "category": "logic",
+      "prompt": "Alice is taller than Bob. Bob is taller than Carol. Who is the shortest person?",
+      "answer_regex": "[Cc]arol",
+      "answer_description": "Carol"
+    },
+    {
+      "id": "logic-2",
+      "category": "logic",
+      "prompt": "A bat and ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+      "answer_regex": "\\$0?\\.05|five cents|5 cents",
+      "answer_description": "$0.05"
+    },
+    {
+      "id": "logic-3",
+      "category": "logic",
+      "prompt": "If today is Wednesday, what day of the week will it be exactly 100 days from now?",
+      "answer_regex": "[Ff]riday",
+      "answer_description": "Friday"
+    },
+    {
+      "id": "logic-4",
+      "category": "logic",
+      "prompt": "You have 8 identical-looking balls. One is slightly heavier. Using a balance scale, what is the minimum number of weighings needed to guarantee finding the heavy one?",
+      "answer_regex": "\\b2\\b",
+      "answer_description": "2"
+    },
+    {
+      "id": "code-1",
+      "category": "coding",
+      "prompt": "Write a Python function called reverse_string that takes a string and returns it reversed. Return only the function, no explanation.",
+      "answer_regex": "def reverse_string|[::]-1\\]",
+      "answer_description": "function with [::-1] slicing"
+    },
+    {
+      "id": "code-2",
+      "category": "coding",
+      "prompt": "Write a Python function called is_prime that returns True if a number is prime, False otherwise. Return only the function.",
+      "answer_regex": "def is_prime",
+      "answer_description": "def is_prime"
+    },
+    {
+      "id": "code-3",
+      "category": "coding",
+      "prompt": "Write a Python function called fibonacci that computes the nth Fibonacci number. Return only the function.",
+      "answer_regex": "def fibonacci",
+      "answer_description": "def fibonacci"
+    },
+    {
+      "id": "code-4",
+      "category": "coding",
+      "prompt": "Write a Python function that takes a list of lists and flattens it into a single list. Call it flatten_list. Return only the function.",
+      "answer_regex": "def flatten_list",
+      "answer_description": "def flatten_list"
+    },
+    {
+      "id": "factual-1",
+      "category": "factual",
+      "prompt": "What is the capital of Australia?",
+      "answer_regex": "[Cc]anberra",
+      "answer_description": "Canberra"
+    },
+    {
+      "id": "factual-2",
+      "category": "factual",
+      "prompt": "What is the chemical symbol for gold?",
+      "answer_regex": "\\bAu\\b",
+      "answer_description": "Au"
+    },
+    {
+      "id": "factual-3",
+      "category": "factual",
+      "prompt": "In what year did the Berlin Wall fall?",
+      "answer_regex": "\\b1989\\b",
+      "answer_description": "1989"
+    },
+    {
+      "id": "factual-4",
+      "category": "factual",
+      "prompt": "What is the boiling point of water at sea level in Celsius?",
+      "answer_regex": "\\b100\\b",
+      "answer_description": "100"
+    },
+    {
+      "id": "reasoning-1",
+      "category": "reasoning",
+      "prompt": "A farmer has 100 meters of fencing to enclose a rectangular field. What dimensions maximize the enclosed area? Give the dimensions.",
+      "answer_regex": "25.*25|25\\s*[x×]\\s*25",
+      "answer_description": "25x25 (square)"
+    },
+    {
+      "id": "reasoning-2",
+      "category": "reasoning",
+      "prompt": "If you have a 3-gallon jug and a 5-gallon jug, how do you measure exactly 4 gallons? Describe the steps.",
+      "answer_regex": "4 gallons|4 gal",
+      "answer_description": "4 gallons measured"
+    },
+    {
+      "id": "reasoning-3",
+      "category": "reasoning",
+      "prompt": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+      "answer_regex": "7\\.5",
+      "answer_description": "7.5 degrees"
+    }
+  ]
+}
