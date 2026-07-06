@@ -166,3 +166,27 @@ Benchmarks run against **GLM-5.2-Int8Mix-NVFP4-REAP-594B** on 4× RTX PRO 6000 B
 **The plugin works on both task types with zero accuracy degradation.** Across reasoning (estonia) and data-audit (lavd) tasks, the overthinking penalty consistently reduces completion tokens by **24-30%** while maintaining perfect correctness — and on LAVD it actually improved scoring precision (5 exact vs 4 exact + 1 near). These results validate the paper's core claims: suppressing hesitation tokens shortens the CoT without losing accuracy, yielding faster wall-clock answers and lower compute cost.
 
 **Caveats:** (1) Tests ran at the model's default reasoning effort (typically `high`, not `max`). GLM-5.2 at `max` effort thinks substantially more and produces stronger results — the plugin's effect may differ at higher effort levels. (2) Sample size is n=5 per condition — sufficient to show the trend but not to rule out small effects. (3) The λ=5.0 default is safe across both task types tested here, but heavier reasoning workloads may benefit from tuning.
+
+## 7. Hybrid Model Comparison (GLM-5.2-MXFP8-NVFP4-NF3-Hybrid vs REAP-594B)
+
+Same benchmarks run against the **full 753B model** (all 256 experts, NVFP4+NF3+MXFP4 hybrid quantization, DCP4/MTP5) on the same 4× RTX PRO 6000 hardware. No plugin on this image (raw baseline).
+
+### Results
+
+| Test | Metric | Hybrid (full 753B) | GOLD REAP (594B) |
+| :--- | :--- | :---: | :---: |
+| **ESTONIA** | Correctness | 100% (5/5) | 100% (5/5) |
+| | Avg tokens | 3,639 | 2,860 |
+| | Throughput | 61.3 tok/s | 70.7 tok/s |
+| **LAVD** | Correctness | 100% (5/5) | 100% (5/5) |
+| | Avg tokens | **13,719** | 18,492 |
+| | Throughput | 72.6 tok/s | 85.5 tok/s |
+
+### Analysis
+
+- **Both models achieve 100% accuracy** on estonia and lavd — at this task difficulty, the REAP pruning doesn't cost correctness.
+- **Hybrid is slower** (61-73 tok/s vs 71-86 tok/s) — expected: the full 753B has 52% more total parameters to move per token (all 256 experts vs 168). Decode is memory-bandwidth-bound, so more weights = slower.
+- **Hybrid uses fewer tokens on LAVD** (13,719 vs 18,492, −26%) — the full expert set lets the model solve the data-audit task more efficiently (fewer reasoning steps needed). On estonia, the hybrid reasons slightly MORE (3,639 vs 2,860), suggesting the full model explores more thoroughly on open-ended reasoning.
+- **The tradeoff:** the hybrid trades ~15-20% decode speed for keeping all experts. On harder benchmarks (GPQA Diamond: 88.38 vs 86.87), this pays off. On estonia/lavd, both max out at 100%.
+
+*Hybrid model: `madeby561/GLM-5.2-MXFP8-NVFP4-NF3-Hybrid`, served with exact repo compose (DCP4/MTP5/MXFP8 native, port 5001). GOLD: `GLM-5.2-Int8Mix-NVFP4-REAP-594B`, DCP2/MTP3. Same hardware, same benchmark tool, same prompts.*
